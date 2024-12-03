@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{result, sync::Arc};
 
 use axum::{
     extract::Query,
@@ -143,5 +143,60 @@ pub async fn verify_email(
     Query(query_params): Query<VerifyEmailQueryDto>,
     Extension(app_state): Extension<Arc<AppState>>
 ) -> Result<impl IntoResponse, HttpError> {
+    query_params.validate()
+        .map_err(|e| HttpError::bad_request(e.to_string()))?;
     
+    let result = app_state.db_client
+        .get_user(None, None, None, Some(&query_params.token))
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let user = result.ok_or(HttpError::unauthrorized(ErrorMessage::InvalidToken.to_string()))?;
+
+    if let Some(expires_at) = user.token_expires_at {
+        if Utc::now() > expires_at {
+            return Err(HttpError::bad_request("Verification token has expired".to_string()))?;
+        }
+    } else {
+        return Err(HttpError::bad_request("Invalid verification token".to_string()))?;
+    }
+
+    app_state.db_client.verifed_token(&query_params.token)
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let send_welcome_email_result = send_welcome_email(&user.email, &user.name).await;
+
+    if let Err(e) = send_welcome_email_result {
+        eprint!("Failed to send welcome email: {}", e);
+    }
+
+    let token = token::create_token(
+        &user.id.to_string(),
+        app_state.env.jwt_secret.as_bytes(),
+        app_state.env.jwt_maxage
+    ).map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let cookie_duration = time::Duration::minutes(app_state.env.jwt_maxage * 60);
+    let cookie = Cookie::build(("token", token.clone()))
+        .path("/")
+        .max_age(cookie_duration)
+        .http_only(true)
+        .build();
+
+    let mut headers = HeaderMap::new();
+
+    headers.append(
+        header::SET_COOKIE,
+        cookie.to_string().parse().unwrap()
+    );
+
+    let front_end_url = format!("http://localhost:5173/settings");
+    let redirect = Redirect::to(&front_end_url);
+    let mut response = redirect.into_response();
+    response.headers_mut().extend(headers);
+    
+    Ok(response)
 }
+
+
