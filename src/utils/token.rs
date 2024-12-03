@@ -1,20 +1,12 @@
 use axum::http::StatusCode;
 use chrono::{Duration, Utc};
-use jsonwebtoken::{
-    decode,
-    encode,
-    Algorithm,
-    DecodingKey,
-    EncodingKey,
-    Header,
-    Validation
-};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
 use crate::error::{ErrorMessage, HttpError};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct TokenClaims{
+pub struct TokenClaims {
     pub sub: String,
     pub iat: usize,
     pub exp: usize,
@@ -38,16 +30,14 @@ pub fn create_token(
         exp,
     };
 
-    encode(&Header::default(), 
-            &claims,
-            &EncodingKey::from_secret(secret)
-        )
+    encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(secret),
+    )
 }
 
-pub fn decode_token<T: Into<String>> (
-    token: T,
-    secret: &[u8]
-) -> Result<String, HttpError> {
+pub fn decode_token<T: Into<String>>(token: T, secret: &[u8]) -> Result<String, HttpError> {
     let decode = decode::<TokenClaims>(
         &token.into(),
         &DecodingKey::from_secret(secret),
@@ -56,6 +46,9 @@ pub fn decode_token<T: Into<String>> (
 
     match decode {
         Ok(token) => Ok(token.claims.sub),
-        Err(_) => Err(HttpError::new(ErrorMessage::InvalidToken.to_string(), StatusCode::UNAUTHORIZED))
+        Err(_) => Err(HttpError::new(
+            ErrorMessage::InvalidToken.to_string(),
+            StatusCode::UNAUTHORIZED,
+        )),
     }
 }

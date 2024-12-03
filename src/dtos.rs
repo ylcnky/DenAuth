@@ -1,5 +1,5 @@
-use core::str;
 use chrono::{DateTime, Utc};
+use core::str;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -14,14 +14,15 @@ pub struct RegisterUserDto {
         email(message = "Email is invalid")
     )]
     pub email: String,
-    #[validate(
-        length(min = 6, message = "Password is required and must be at least 6 characters")
-    )]
+    #[validate(length(
+        min = 6,
+        message = "Password is required and must be at least 6 characters"
+    ))]
     pub password: String,
 
     #[validate(
         length(min = 1, message = "Confirm Password is required"),
-        must_match(other = "password", message="passwords do not match")
+        must_match(other = "password", message = "passwords do not match")
     )]
     #[serde(rename = "passwordConfirm")]
     pub password_confirm: String,
@@ -29,11 +30,15 @@ pub struct RegisterUserDto {
 
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct LoginUserDto {
-    #[validate(length(min = 1, message = "Email is required"), email(message = "Email is invalid"))]
-    pub email: String,
     #[validate(
-        length(min = 6, message = "Password is required and must be at least 6 characters")
+        length(min = 1, message = "Email is required"),
+        email(message = "Email is invalid")
     )]
+    pub email: String,
+    #[validate(length(
+        min = 6,
+        message = "Password is required and must be at least 6 characters"
+    ))]
     pub password: String,
 }
 
@@ -127,48 +132,60 @@ fn validate_user_role(role: &UserRole) -> Result<(), validator::ValidationError>
 
 #[derive(Debug, Validate, Default, Clone, Serialize, Deserialize)]
 pub struct UserPasswordUpdateDto {
-    #[validate(
-        length(min = 6, message = "New password is required and must be at least 6 characters")
-    )]
+    #[validate(length(
+        min = 6,
+        message = "New password is required and must be at least 6 characters"
+    ))]
     pub new_password: String,
 
     #[validate(
-        length(min = 1, message = "New password confirm is required and must be at least 6 characters"),
-        must_match(other = "new_password", message="new passwords do not match")
+        length(
+            min = 1,
+            message = "New password confirm is required and must be at least 6 characters"
+        ),
+        must_match(other = "new_password", message = "new passwords do not match")
     )]
     pub new_password_confirm: String,
 
-    #[validate(
-        length(min = 1, message = "Old password is required and must be at least 6 characters")
-    )]
+    #[validate(length(
+        min = 1,
+        message = "Old password is required and must be at least 6 characters"
+    ))]
     pub old_password: String,
 }
 
 #[derive(Serialize, Deserialize, Validate)]
 pub struct VerifyEmailQueryDto {
-    #[validate(length(min = 1, message = "Token is required."),)]
+    #[validate(length(min = 1, message = "Token is required."))]
     pub token: String,
 }
 
 #[derive(Deserialize, Serialize, Validate, Debug, Clone)]
 pub struct ForgotPasswordRequestDto {
-    #[validate(length(min = 1, message = "Email is required"), email(message = "Email is invalid"))]
+    #[validate(
+        length(min = 1, message = "Email is required"),
+        email(message = "Email is invalid")
+    )]
     pub email: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate, Clone)]
 pub struct ResetPasswordRequestDto {
-    #[validate(length(min = 1, message = "Token is required."),)]
+    #[validate(length(min = 1, message = "Token is required."))]
     pub token: String,
 
-    #[validate(
-        length(min = 1, message = "New password is required and must be at least 6 characters")
-    )]
+    #[validate(length(
+        min = 1,
+        message = "New password is required and must be at least 6 characters"
+    ))]
     pub new_password: String,
 
     #[validate(
-        length(min = 1, message = "New password confirm is required and must be at least 6 characters"),
-        must_match(other = "new_password", message="new passwords do not match")
+        length(
+            min = 1,
+            message = "New password confirm is required and must be at least 6 characters"
+        ),
+        must_match(other = "new_password", message = "new passwords do not match")
     )]
     pub new_password_confirm: String,
 }

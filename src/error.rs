@@ -88,7 +88,7 @@ impl HttpError {
         }
     }
 
-    pub fn unique_constraint_validation(message: impl Into<String>) -> Self {
+    pub fn unique_constraint_violation(message: impl Into<String>) -> Self {
         HttpError { 
             message: message.into(), 
             status: StatusCode::CONFLICT 

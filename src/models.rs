@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[sqlx(type_name = "user_role", rename_all = "lowercase")]
 pub enum UserRole {
     Admin,
-    User
+    User,
 }
 
 impl UserRole {
@@ -31,5 +31,4 @@ pub struct User {
     pub created_at: Option<DateTime<Utc>>,
     #[serde(rename = "updatedAt")]
     pub updated_at: Option<DateTime<Utc>>,
-
 }

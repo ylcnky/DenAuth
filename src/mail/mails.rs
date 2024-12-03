@@ -17,32 +17,30 @@ pub async fn send_verification_email(
     send_email(to_email, subject, template_path, &placeholders).await
 }
 
-fn create_verification_link(base_url:&str, token:&str) -> String {
+fn create_verification_link(base_url: &str, token: &str) -> String {
     format!("{}?token={}", base_url, token)
 }
 
 pub async fn send_welcome_email(
     to_email: &str,
-    username: &str
+    username: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let subject = "Welcome to DenAuth Application";
     let template_path = "src/mail/templates/Welcome-email.html";
-    let placeholders = vec![
-        ("{{username}}".to_string(), username.to_string()),
-    ];
+    let placeholders = vec![("{{username}}".to_string(), username.to_string())];
     send_email(to_email, subject, template_path, &placeholders).await
 }
 
 pub async fn send_forgot_password_email(
     to_email: &str,
     rest_link: &str,
-    username: &str
+    username: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let subject = "Reset Your Password";
     let template_path = "src/mail/templates/RestPassword-email.html";
     let placeholders = vec![
         ("{{username}}".to_string(), username.to_string()),
-        ("{{rest_link}}".to_string(), rest_link.to_string())
+        ("{{rest_link}}".to_string(), rest_link.to_string()),
     ];
     send_email(to_email, subject, template_path, &placeholders).await
 }
