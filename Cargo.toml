@@ -9,17 +9,17 @@ async-trait = "0.1.72" # allowing to use async function in threaded applications
 chrono = { version = "0.4.26", features = ["serde"]} # date and time library with timestamps especially database records
 dotenv = "0.15.0" # allows us to read env variables from a .env file
 jsonwebtoken = "9.2.0" # creating and using jwt to use for authentication
-serde = { version = "1.0.215", features = ["derive"]} # standard library to serialize and deserialize standard Rust datatypes to other structures
+serde = { version = "1.0.183", features = ["derive"]} # standard library to serialize and deserialize standard Rust datatypes to other structures
 serde_json = "1.0.104" # standard library to serialize and deserialize standard Rust datatypes to json
 sqlx = { version = "0.8.1", features = ["runtime-async-std-native-tls", "postgres", "chrono", "uuid"]} # async library to interact with postgres library
 uuid = { version = "1.4.1", features = ["serde", "v4"]} # helps generate uuids for database
-validator = { version = "0.19.0", features = ["derive"]} # validation for our data models
+validator = { version = "0.16.1", features = ["derive"]} # validation for our data models
 axum = "0.7.5" # http server library
 # axum-extra didn't work with features =  ["full"] somehow. All features are defined manually
-axum-extra = { version = "0.9.6", features = ["async-read-body", "cookie", "cookie-private", "cookie-signed", "cookie-key-expansion", "erased-json", "form", "json-deserializer", "json-lines", "multipart", "protobuf", "query", "tracing", "typed-routing", "typed-header"]} # extra features to axum library
+axum-extra = { version = "0.9.3", features = ["cookie"]}
 tokio = { version = "1.39.3", features = ["full"]} # async runtime that powers the application
 tower = "0.5.0" # modular and reusable components to build networking client
 time = "0.3.20" # library to work with time, complements chrono
-tower-http = { version = "0.6.2", features = ["cors", "trace"]} # extra features http utilities
+tower-http = { version = "0.5.2", features = ["cors", "trace"]} # extra features http utilities
 tracing-subscriber ={ version = "0.3.18"} # structured logs collection
 lettre = "0.11.7" # libraries to send emails

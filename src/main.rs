@@ -15,7 +15,7 @@ use axum::http::{ header::{ ACCEPT, AUTHORIZATION, CONTENT_TYPE }, HeaderValue, 
 use config::Config;
 use db::DBClient;
 use dotenv::dotenv;
-// use routes::create_router;
+use routes::create_router;
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::filter::LevelFilter;

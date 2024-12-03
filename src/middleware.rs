@@ -2,25 +2,25 @@ use std::sync::Arc;
 
 use axum::{
     extract::Request,
-    http::{ header, StatusCode },
+    http::{header, StatusCode},
     middleware::Next,
     response::IntoResponse,
     Extension,
 };
 
 use axum_extra::extract::cookie::CookieJar;
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
 
 use crate::{
     db::UserExt,
-    error::{ ErrorMessage, HttpError },
-    models::{ User, UserRole },
+    error::{ErrorMessage, HttpError},
+    models::{User, UserRole},
     utils::token,
     AppState,
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct JWTAuthMiddleware {
+pub struct JWTAuthMiddeware {
     pub user: User,
 }
 
@@ -28,7 +28,7 @@ pub async fn auth(
     cookie_jar: CookieJar,
     Extension(app_state): Extension<Arc<AppState>>,
     mut req: Request,
-    next: Next
+    next: Next,
 ) -> Result<impl IntoResponse, HttpError> {
     let cookies = cookie_jar
         .get("token")
@@ -46,32 +46,32 @@ pub async fn auth(
                 })
         });
 
-    let token = cookies.ok_or_else(|| {
-        HttpError::unauthrorized(ErrorMessage::TokenNotProvided.to_string())
-    })?;
+    let token = cookies
+        .ok_or_else(|| HttpError::unauthrorized(ErrorMessage::TokenNotProvided.to_string()))?;
 
     let token_details = match token::decode_token(token, app_state.env.jwt_secret.as_bytes()) {
         Ok(token_details) => token_details,
         Err(_) => {
-            return Err(HttpError::unauthrorized(ErrorMessage::InvalidToken.to_string()));
+            return Err(HttpError::unauthrorized(
+                ErrorMessage::InvalidToken.to_string(),
+            ));
         }
     };
 
-    let user_id = uuid::Uuid
-        ::parse_str(&token_details.to_string())
-        .map_err(|_| { HttpError::unauthrorized(ErrorMessage::InvalidToken.to_string()) })?;
+    let user_id = uuid::Uuid::parse_str(&token_details.to_string())
+        .map_err(|_| HttpError::unauthrorized(ErrorMessage::InvalidToken.to_string()))?;
 
-    let user = app_state.db_client
-        .get_user(Some(user_id), None, None, None).await
-        .map_err(|_| { HttpError::unauthrorized(ErrorMessage::UserNoLongerExist.to_string()) })?;
+    let user = app_state
+        .db_client
+        .get_user(Some(user_id), None, None, None)
+        .await
+        .map_err(|_| HttpError::unauthrorized(ErrorMessage::UserNoLongerExist.to_string()))?;
 
-    let user = user.ok_or_else(|| {
-        HttpError::unauthrorized(ErrorMessage::UserNoLongerExist.to_string())
-    })?;
+    let user =
+        user.ok_or_else(|| HttpError::unauthrorized(ErrorMessage::UserNoLongerExist.to_string()))?;
 
-    req.extensions_mut().insert(JWTAuthMiddleware {
-        user: user.clone(),
-    });
+    req.extensions_mut()
+        .insert(JWTAuthMiddeware { user: user.clone() });
 
     Ok(next.run(req).await)
 }
@@ -80,19 +80,18 @@ pub async fn role_check(
     Extension(_app_state): Extension<Arc<AppState>>,
     req: Request,
     next: Next,
-    required_roles: Vec<UserRole>
+    required_roles: Vec<UserRole>,
 ) -> Result<impl IntoResponse, HttpError> {
     let user = req
         .extensions()
-        .get::<JWTAuthMiddleware>()
-        .ok_or_else(|| {
-            HttpError::unauthrorized(ErrorMessage::UserNotAuthenticated.to_string())
-        })?;
+        .get::<JWTAuthMiddeware>()
+        .ok_or_else(|| HttpError::unauthrorized(ErrorMessage::UserNotAuthenticated.to_string()))?;
 
     if !required_roles.contains(&user.user.role) {
-        return Err(
-            HttpError::new(ErrorMessage::PermissionDenied.to_string(), StatusCode::FORBIDDEN)
-        );
+        return Err(HttpError::new(
+            ErrorMessage::PermissionDenied.to_string(),
+            StatusCode::FORBIDDEN,
+        ));
     }
 
     Ok(next.run(req).await)
