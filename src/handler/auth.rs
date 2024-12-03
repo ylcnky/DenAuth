@@ -7,8 +7,9 @@ use axum::{
     routing::{get, post},
     Extension, Json, Router,
 };
-use axum_extra::extract::cookie::{self, Cookie};
+use axum_extra::extract::cookie::Cookie;
 use chrono::{Duration, Utc};
+use uuid::Uuid;
 use validator::Validate;
 
 use crate::{
@@ -199,4 +200,42 @@ pub async fn verify_email(
     Ok(response)
 }
 
+pub async fn forgot_password(
+    Extension(app_state): Extension<Arc<AppState>>,
+    Json(body): Json<ForgotPasswordRequestDto>
+) -> Result<impl IntoResponse, HttpError> {
+    body.validate()
+        .map_err(|e| HttpError::bad_request(e.to_string()))?;
 
+    let result = app_state.db_client
+        .get_user(None, None, Some(&body.email), None)
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let user = result.ok_or(HttpError::bad_request("Email not found!".to_string()))?;
+
+    let verification_token = uuid::Uuid::new_v4().to_string();
+    let expires_at = Utc::now() + Duration::minutes(30);
+
+    let user_id = uuid::Uuid::parse_str(&user.id.to_string()).unwrap();
+
+    app_state.db_client
+        .add_verifed_token(user_id, &verification_token, expires_at)
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let reset_link = format!("http://localhost:5173/reset-password?token={}", &verification_token);
+    let email_sent = send_forgot_password_email(&user.email, &reset_link, &user.name).await;
+
+    if let Err(e) = email_sent {
+        eprint!("Failed to send forgot password email: {}", e);
+        return Err(HttpError::server_error("Failed to send email".to_string()));
+    }
+
+    let response = Response {
+        message: "Password reset link has been sent to your email.".to_string(),
+        status: "success",
+    };
+
+    Ok(Json(response))
+}
