@@ -20,7 +20,7 @@ To run this code base, you will need:
 ## Installation
 1. Clone the repository
 ```bash
-git clone ....
+git clone git@github.com:ylcnky/DenAuth.git
 cd DenAuth
 ```
 2. Install dependencies:
