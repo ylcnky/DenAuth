@@ -1,23 +1,17 @@
-use chrono::{DateTime, Utc};
+use chrono::{ DateTime, Utc };
 use core::str;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use validator::Validate;
 
-use crate::models::{User, UserRole};
+use crate::models::{ User, UserRole };
 
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct RegisterUserDto {
     #[validate(length(min = 1, message = "Name is required"))]
     pub name: String,
-    #[validate(
-        length(min = 1, message = "Email is required"),
-        email(message = "Email is invalid")
-    )]
+    #[validate(length(min = 1, message = "Email is required"), email(message = "Email is invalid"))]
     pub email: String,
-    #[validate(length(
-        min = 6,
-        message = "Password is required and must be at least 6 characters"
-    ))]
+    #[validate(length(min = 6, message = "Password is required and must be at least 6 characters"))]
     pub password: String,
 
     #[validate(
@@ -30,15 +24,9 @@ pub struct RegisterUserDto {
 
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct LoginUserDto {
-    #[validate(
-        length(min = 1, message = "Email is required"),
-        email(message = "Email is invalid")
-    )]
+    #[validate(length(min = 1, message = "Email is required"), email(message = "Email is invalid"))]
     pub email: String,
-    #[validate(length(
-        min = 6,
-        message = "Password is required and must be at least 6 characters"
-    ))]
+    #[validate(length(min = 6, message = "Password is required and must be at least 6 characters"))]
     pub password: String,
 }
 
@@ -132,10 +120,9 @@ fn validate_user_role(role: &UserRole) -> Result<(), validator::ValidationError>
 
 #[derive(Debug, Validate, Default, Clone, Serialize, Deserialize)]
 pub struct UserPasswordUpdateDto {
-    #[validate(length(
-        min = 6,
-        message = "New password is required and must be at least 6 characters"
-    ))]
+    #[validate(
+        length(min = 6, message = "New password is required and must be at least 6 characters")
+    )]
     pub new_password: String,
 
     #[validate(
@@ -147,10 +134,9 @@ pub struct UserPasswordUpdateDto {
     )]
     pub new_password_confirm: String,
 
-    #[validate(length(
-        min = 1,
-        message = "Old password is required and must be at least 6 characters"
-    ))]
+    #[validate(
+        length(min = 1, message = "Old password is required and must be at least 6 characters")
+    )]
     pub old_password: String,
 }
 
@@ -162,10 +148,7 @@ pub struct VerifyEmailQueryDto {
 
 #[derive(Deserialize, Serialize, Validate, Debug, Clone)]
 pub struct ForgotPasswordRequestDto {
-    #[validate(
-        length(min = 1, message = "Email is required"),
-        email(message = "Email is invalid")
-    )]
+    #[validate(length(min = 1, message = "Email is required"), email(message = "Email is invalid"))]
     pub email: String,
 }
 
@@ -174,10 +157,9 @@ pub struct ResetPasswordRequestDto {
     #[validate(length(min = 1, message = "Token is required."))]
     pub token: String,
 
-    #[validate(length(
-        min = 1,
-        message = "New password is required and must be at least 6 characters"
-    ))]
+    #[validate(
+        length(min = 1, message = "New password is required and must be at least 6 characters")
+    )]
     pub new_password: String,
 
     #[validate(

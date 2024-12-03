@@ -1,6 +1,6 @@
 #  🔐  `</DenAuth>`
 
-A Rust based, fully functional backend using the [Axum](https://github.com/tokio-rs/axum]) framework. It includes user authentication, email verification, and a connection to a PostgreSQL database.
+A [Rust](https://www.rust-lang.org/) based authentication backend solution using the [Axum](https://github.com/tokio-rs/axum]) framework. It includes user authentication, email verification, JWT authentication, and a connection to a PostgreSQL database.
 
 ## Features
 * **User Authentication**: Register, login, password reset functionality,
