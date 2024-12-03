@@ -1,4 +1,4 @@
-# «DenAuth»
+#  🔐  `</DenAuth>`
 
 A Rust based, fully functional backend using the [Axum](https://github.com/tokio-rs/axum]) framework. It includes user authentication, email verification, and a connection to a PostgreSQL database.
 
