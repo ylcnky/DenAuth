@@ -45,9 +45,11 @@ The server will be running on `http://127.0.0.1:800`
 ## Email Verification Setup
 To enable email verification, you will need to configure an email service provider. Update the following environment variables in your `.env` file
 ```bash
-SMTP_SERVER=......
-SMTP_PORT=......
-SMTP_USER=......
-SMTP_PASSWORD=......
-```
-... TBC
+SMTP_SERVER=smtp.your-email-provider.com
+SMTP_PORT=587
+SMTP_USER=your-email@example.com
+SMTP_PASSWORD=your-email-password
+````
+
+## API Testing with Postman
+You can test all the API endpoints using the provided Postman collection. Download the Postman collection here and import it into Postman.
